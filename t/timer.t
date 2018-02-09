@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 6;
 use TAP::Harness;
 use IO::Scalar;
 use File::Slurp qw(write_file);
@@ -28,6 +28,19 @@ timer_enabled: {
         use Test::More tests => 2;
         pass 'one';
         pass 'two';
+    |;
+    my $results = run_test($test, {
+        timer => 1,
+    } );
+    ok $results, 'got JUnit';
+    like $results, qr/time/ism, '... with timing information';
+}
+
+###############################################################################
+# When a test fails to run, JUnit output should be returned.
+timer_enabled_test_empty: {
+    my $test     = qq|
+        die;
     |;
     my $results = run_test($test, {
         timer => 1,
